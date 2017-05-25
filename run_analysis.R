@@ -17,7 +17,7 @@ variables <- read.table("features.txt")
 
 ## Set column names to be the labels in "features"
 colnames(test_X) <- variables[,2]
-colnames(train_X) <- varibales[, 2]
+colnames(train_X) <- variables[, 2]
 
 ## Rename the columns to identify activity
 colnames(train_Y) <- "activity_id"
@@ -43,14 +43,14 @@ all_merged <- rbind(merged_test, merged_train)
 columns <- colnames(all_merged)
 
 ## Select only mean and standard deviation measurements
-mean_sd <- (grepl("activity_id", columns))| grepl("subject_id", columns)|grepl("mean..", columns)|grepl("std..", columns)
+mean_sd <- (grepl("activity_id", columns))| grepl("subject_id", columns)|grepl("activity_label", columns)|grepl("mean..", columns)|grepl("std..", columns)
 mean_sd_subset <- all_merged [, mean_sd == TRUE]
 
 ##Add descriptive labeling to activity id
 des_activity <- merge(mean_sd_subset, activities, by="activity_id")
 
 ## Cleaning up variable names
-columns_sub <- colnames(mean_sd_subset)
+columns_sub <- colnames(des_activity)
 for (i in 1:length(columns_sub)) 
 {
   columns_sub[i] = gsub("\\()", "",columns_sub[i])
@@ -66,10 +66,10 @@ for (i in 1:length(columns_sub))
 }
 
 ##Re-set variable names to new clean variables
-colnames(mean_sd_subset) = columns_sub
+colnames(des_activity) = columns_sub
 
 ## Create new tidy dataset with the average of each variable for each activity and each subject
-new_tidy_mean <- aggregate(. ~subject_id + activity_id, mean_sd_subset, mean)
+new_tidy_mean <- aggregate(. ~subject_id + activity_label, des_activity, mean)
 
 ## Write new tidy text file
 write.table(new_tidy_mean, "new_tidy_mean.txt", row.name=FALSE)
